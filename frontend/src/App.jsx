@@ -2,7 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import School from "./pages/School";
 import Cart from "./pages/Cart";
-import FeedbackModal from "./components/FeedbackModal"; // 👈 引入等一下要做的回報小視窗
+import FeedbackModal from "./components/FeedbackModal";
+import CartButton from "./components/CartButton"; // 👈 完美引入我們剛剛寫的按鈕
 
 function App() {
   return (
@@ -13,8 +14,9 @@ function App() {
         <Route path="/cart" element={<Cart />} />
       </Routes>
 
-      {/* 💬 全站全自動懸浮意見回報鈕 */}
-      <FeedbackModal />
+      {/* 📊 全站雙懸浮客服/工具組 */}
+      <CartButton />      {/* 🟢 疊在上面 (bottom: 24px + 按鈕高度，算好 24分界) */}
+      <FeedbackModal />  {/* 🔵 在最下面 (請確保你裡面的樣式 bottom 已經改成 24px) */}
     </div>
   );
 }

@@ -16,7 +16,7 @@ export default function Home() {
   const [expandedDepts, setExpandedDepts] = useState([]);
   const [deptLoadingStates, setDeptLoadingStates] = useState({});
 
-  // 💡 新增：待篩選校系清單（初始化自 localStorage）
+  // 💡 待篩選校系清單（初始化自 localStorage）
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem("selected_departments");
     return saved ? JSON.parse(saved) : [];
@@ -106,7 +106,7 @@ export default function Home() {
     }
   };
 
-  // 💡 新增：切換加入/移除待篩選校系
+  // 💡 修改：切換加入/移除待篩選校系，並發送全域事件通知外層懸浮鈕
   const toggleCartItem = (e, schoolId, schoolName, deptName) => {
     e.stopPropagation(); // 防止觸發展開面板
     const formattedId = String(schoolId).padStart(3, "0");
@@ -115,11 +115,17 @@ export default function Home() {
       (item) => item.schoolId === formattedId && item.deptName === deptName
     );
 
+    let updatedCart = [];
     if (exists) {
-      setCartItems(cartItems.filter((item) => !(item.schoolId === formattedId && item.deptName === deptName)));
+      updatedCart = cartItems.filter((item) => !(item.schoolId === formattedId && item.deptName === deptName));
     } else {
-      setCartItems([...cartItems, { schoolId: formattedId, schoolName, deptName }]);
+      updatedCart = [...cartItems, { schoolId: formattedId, schoolName, deptName }];
     }
+
+    setCartItems(updatedCart);
+
+    // 📣 大聲告訴外層 CartButton：「資料更新囉，快點重新整理數字！」
+    window.dispatchEvent(new Event("cartUpdated"));
   };
 
   const handleSchoolClick = (schoolId) => {
@@ -130,21 +136,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans relative pb-20">
       
-      {/* 💡 右下角/右上角 待篩選清單懸浮按鈕 */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
-          onClick={() => navigate("/cart")}
-          className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-5 py-3.5 rounded-full shadow-lg hover:shadow-xl transition-all font-bold group scale-100 hover:scale-105"
-        >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-          </svg>
-          待篩選校系
-          <span className="bg-white text-emerald-700 rounded-full px-2 py-0.5 text-xs font-black min-w-[20px] text-center">
-            {cartItems.length}
-          </span>
-        </button>
-      </div>
+      {/* 💡 備註：原本位於此處的「待篩選校系」懸浮按鈕 HTML 區塊已成功移至 App.jsx 的全站工具組 */}
 
       {/* 🚀 頂部橫幅 */}
       <header className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-blue-900 text-white py-16 px-4 text-center shadow-md relative overflow-hidden">
@@ -263,7 +255,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* 💡 狀況 C：顯示搜尋結果 */}
+          {/* 💡 顯示搜尋結果 */}
           {searchQuery && searchResults.map((item) => {
             const schoolId = item.id;
             const schoolName = item.school;
@@ -300,7 +292,6 @@ export default function Home() {
                       const trendData = searchTrendData[uniqueKey] || [];
                       const maxYear = trendData.length > 0 ? Math.max(...trendData.map((d) => Number(d.year || 0))) : 0;
 
-                      // 💡 檢查是否已被加入暫存清單
                       const isInCart = cartItems.some(c => c.schoolId === displayCode && c.deptName === dept);
 
                       return (
@@ -328,9 +319,7 @@ export default function Home() {
                               </span>
                             </div>
                             
-                            {/* 右側按鈕群群（包含暫存書籤 ＆ 展開箭頭） */}
                             <div className="flex items-center gap-3 ml-2">
-                              {/* 💡 暫存清單按鈕 */}
                               <button
                                 onClick={(e) => toggleCartItem(e, schoolId, schoolName, dept)}
                                 className={`p-2 rounded-xl border transition-all ${

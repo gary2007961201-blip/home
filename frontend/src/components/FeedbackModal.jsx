@@ -85,7 +85,7 @@ function FeedbackModal() {
         onClick={() => setIsOpen(!isOpen)}
         style={{
           position: "fixed",
-          bottom: "85px",
+          bottom: "24px",
           right: "24px",
           backgroundColor: isLimited ? "#9ca3af" : "#4f46e5", // 超額時按鈕變灰色
           color: "white",
@@ -109,7 +109,7 @@ function FeedbackModal() {
         <div
           style={{
             position: "fixed",
-            bottom: "145px",
+            bottom: "85px",
             right: "24px",
             width: "320px",
             backgroundColor: "white",
@@ -139,7 +139,7 @@ function FeedbackModal() {
           {status !== "success" && status !== "limit" && (
             <form onSubmit={handleSubmit}>
               <textarea
-                placeholder="例如：歷屆分數錯誤、網站功能出錯或不足、UI設計、(或你/妳只是想講點話)..."
+                placeholder="例如：歷屆分數錯誤、網站功能出錯或不足、UI設計、(或你/妳想分享什麼事)..."
                 required
                 rows="4"
                 value={message}
